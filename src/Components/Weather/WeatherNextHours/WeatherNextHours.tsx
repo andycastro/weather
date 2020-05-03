@@ -14,7 +14,7 @@ import {
 } from "../../../styles/grid.style";
 
 const WeatherNow = (props: any) => {
-  const { error, tempMin, tempMax } = props;
+  const { error, tempMin, tempMax, saveLocation } = props;
 
   return (
     <>
@@ -140,7 +140,7 @@ const WeatherNow = (props: any) => {
         </Box>
         <Box padding={"0"} margin={"0"}>
           <Box radius={"5px"} margin={"0 15px 20px 0"}>
-            <ContentBox height={"22vh"} margin={"0"}>
+            <ContentBox height={"22vh"} margin={"0"} cursor={"pointer"}>
               <Box
                 padding={"0"}
                 margin={"0"}
@@ -148,8 +148,12 @@ const WeatherNow = (props: any) => {
                 flexDirection={"row"}
                 justifyContent={"center"}
               >
-                <LoveIcon width={"30px"} />
-                <MediumTitle margin={"0 0 0 10px"} fontSize={"1em"}>
+                <LoveIcon width={"30px"} onClick={saveLocation} />
+                <MediumTitle
+                  margin={"0 0 0 10px"}
+                  fontSize={"1em"}
+                  onClick={saveLocation}
+                >
                   save location
                 </MediumTitle>
               </Box>

@@ -7,18 +7,23 @@ import WeatherNextHours from "../Components/Weather/WeatherNextHours/WeatherNext
 
 import { Container, Row, Column, Box, ContentBox } from "../styles/grid.style";
 
+const savedLocation = localStorage.getItem("Location");
+const minTempSaved = localStorage.getItem("TempMin");
+const maxTempSaved = localStorage.getItem("TempMax");
+
 const Main = (): any => {
-  const [addressFromUser, setAddressFromUser] = useState("florianopolis");
+  const [addressFromUser, setAddressFromUser] = useState(
+    savedLocation ? savedLocation : "florianopolis"
+  );
   const [findLocation, setFindLocation] = useState("");
   const [lng, setLng] = useState();
   const [lat, setLat] = useState();
-  const [tempMin, setTempMin] = useState<number>();
-  const [tempMax, setTempMax] = useState<number>();
+  const [tempMin, setTempMin] = useState<any>(minTempSaved);
+  const [tempMax, setTempMax] = useState<any>(maxTempSaved);
   const [load, setLoad] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    console.log("called");
     axios
       .all([
         axios.get(
@@ -50,7 +55,29 @@ const Main = (): any => {
         setError(error);
         setLoad(true);
       });
-  }, [addressFromUser, lat, lng]);
+  }, [addressFromUser, lat, lng, tempMin]);
+
+  const saveLocation = () => {
+    localStorage.setItem("Location", findLocation);
+    localStorage.setItem("TempMin", tempMin);
+    localStorage.setItem("TempMax", tempMax);
+    savedItemsExpires();
+  };
+
+  const savedItemsExpires = () => {
+    let hoursToExpire = 1;
+    let now: any = new Date().getTime();
+    console.log(now);
+    let setupTime: any = localStorage.getItem("setupTime");
+    if (setupTime === null) {
+      localStorage.setItem("setupTime", now);
+    } else {
+      if (now - setupTime > hoursToExpire * 60 * 60 * 1000) {
+        localStorage.clear();
+        localStorage.setItem("setupTime", now);
+      }
+    }
+  };
 
   return (
     <>
@@ -84,6 +111,7 @@ const Main = (): any => {
                   error={error}
                   tempMin={tempMin}
                   tempMax={tempMax}
+                  saveLocation={saveLocation}
                 />
               </>
             )}
