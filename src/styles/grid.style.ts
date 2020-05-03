@@ -173,11 +173,13 @@ export const MediumTitle = styled.h2<{
   padding?: string;
   margin?: string;
   fontWeight?: string;
+  textAlign?: string;
 }>`
   color: ${(props) => (props.color ? props.color : "#f9f9f9")};
   font-size: ${(props) => (props.fontSize ? props.fontSize : "1.7em")};
   padding: ${(props) => (props.padding ? props.padding : "0")};
   margin: ${(props) => (props.margin ? props.margin : "0")};
+  text-align: ${(props) => (props.textAlign ? props.textAlign : "left")};
   font-weight: ${(props) => (props.fontWeight ? props.fontWeight : "")};
   span {
     font-size: 0.5em;

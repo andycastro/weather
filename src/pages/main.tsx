@@ -1,36 +1,24 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { FireworkSpinner } from "react-spinners-kit";
 import Header from "../Components/Header/Header";
-import {
-  ThermometerIcon,
-  HazeIcon,
-  LoveIcon,
-  ClockIcon,
-} from "../Components/Icons/Icons";
+import WeatherNow from "../Components/Weather/WeatherNow/WeatherNow";
+import WeatherNextHours from "../Components/Weather/WeatherNextHours/WeatherNextHours";
 
-import {
-  Container,
-  Row,
-  Column,
-  Box,
-  ContentBox,
-  MediumTitle,
-  Pline,
-} from "../styles/grid.style";
+import { Container, Row, Column, Box, ContentBox } from "../styles/grid.style";
 
-const Main = () => {
-  const [addressFromUser, setAddressFromUser] = useState<any>("florianopolis");
-  const [findLocation, setFindLocation] = useState<any>("");
-  const [findLocationWeather, setFindLocationWeather] = useState<any>("");
-  const [lng, setLng] = useState<any>();
-  const [lat, setLat] = useState<any>();
-  const [tempMin, setTempMin] = useState<any>();
-  const [tempMax, setTempMax] = useState<any>();
-  const nameCityLowCase = findLocationWeather.toLowerCase();
-  const tempMinRound = Math.round(tempMin);
-  const tempMaxRound = Math.round(tempMax);
+const Main = (): any => {
+  const [addressFromUser, setAddressFromUser] = useState("florianopolis");
+  const [findLocation, setFindLocation] = useState("");
+  const [lng, setLng] = useState();
+  const [lat, setLat] = useState();
+  const [tempMin, setTempMin] = useState<number>();
+  const [tempMax, setTempMax] = useState<number>();
+  const [load, setLoad] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    console.log("called");
     axios
       .all([
         axios.get(
@@ -47,25 +35,22 @@ const Main = () => {
       .then(
         axios.spread(function (locationResponse, weatherResponse) {
           setFindLocation(locationResponse.data.results[0].formatted_address);
-          setFindLocationWeather(
-            locationResponse.data.results[0].address_components[0].short_name
-          );
           setLat(
             locationResponse.data.results[0].geometry.location.lat.toFixed(2)
           );
           setLng(
             locationResponse.data.results[0].geometry.location.lng.toFixed(2)
           );
-          setTempMin(weatherResponse.data.main.temp_min);
-          setTempMax(weatherResponse.data.main.temp_max);
+          setTempMin(Math.round(weatherResponse.data.main.temp_min));
+          setTempMax(Math.round(weatherResponse.data.main.temp_max));
+          setLoad(true);
         })
       )
       .catch((error) => {
-        console.log(error);
+        setError(error);
+        setLoad(true);
       });
-  }, [addressFromUser, findLocation, lat, lng, nameCityLowCase, tempMax]);
-
-  //
+  }, [addressFromUser, lat, lng]);
 
   return (
     <>
@@ -82,158 +67,37 @@ const Main = () => {
               setAddressFromUser={setAddressFromUser}
               addressFromUser={addressFromUser}
             />
-            <Column mobile="12" tablet="12" desktop="6">
-              <Box padding={"0"} margin={"0"}>
-                <ContentBox margin={"0 50px"} height={"70vh"}>
-                  <Box
-                    padding={"0"}
-                    margin={"0"}
-                    alignItems={"center"}
-                    flexDirection={"column"}
-                  >
-                    <HazeIcon width={"100px"} />
-                    <MediumTitle fontSize={"2em"}>{findLocation}</MediumTitle>
-                    <MediumTitle fontSize={"3em"}>
-                      {tempMinRound}˚C min
-                    </MediumTitle>
-                    <Pline color={"#f9f9f9"}>{tempMaxRound}˚C max</Pline>
+            {load && (
+              <>
+                <Column mobile="12" tablet="12" desktop="6">
+                  <Box padding={"0"} margin={"0"}>
+                    <WeatherNow
+                      load={load}
+                      error={error}
+                      findLocation={findLocation}
+                      tempMin={tempMin}
+                      tempMax={tempMax}
+                    />
                   </Box>
-                </ContentBox>
-              </Box>
-            </Column>
-            <Column mobile="12" tablet="12" desktop="2">
-              <Box padding={"0"} margin={"0"}>
-                <Box radius={"5px"} margin={"80px 15px 20px 0"}>
-                  <ContentBox height={"22vh"} margin={"0"}>
-                    <Box
-                      padding={"0"}
-                      margin={"0"}
-                      alignItems={"center"}
-                      flexDirection={"column"}
-                    >
-                      <MediumTitle fontSize={"1em"}>
-                        <ClockIcon width={"15px"} /> 15h
-                      </MediumTitle>
-                      <MediumTitle fontSize={"2em"}>
-                        <ThermometerIcon width={"20px"} /> {tempMinRound}˚C min
-                      </MediumTitle>
-                      <Pline padding={"0 13px"} color={"#f9f9f9"}>
-                        {tempMaxRound}˚C max
-                      </Pline>
-                    </Box>
-                  </ContentBox>
+                </Column>
+                <WeatherNextHours
+                  error={error}
+                  tempMin={tempMin}
+                  tempMax={tempMax}
+                />
+              </>
+            )}
+            <Column mobile={"12"} tablet={"12"} desktop={"12"}>
+              <ContentBox margin={"0 50px"} height={"70vh"}>
+                <Box
+                  padding={"0"}
+                  margin={"0"}
+                  alignItems={"center"}
+                  flexDirection={"column"}
+                >
+                  {!load && <FireworkSpinner size={70} color="#f9f9f9" />}
                 </Box>
-              </Box>
-              <Box padding={"0"} margin={"0"}>
-                <Box radius={"5px"} margin={"0 15px 20px 0"}>
-                  <ContentBox height={"22vh"} margin={"0"}>
-                    <Box
-                      padding={"0"}
-                      margin={"0"}
-                      alignItems={"center"}
-                      flexDirection={"column"}
-                    >
-                      <MediumTitle fontSize={"1em"}>
-                        <ClockIcon width={"15px"} /> 18h
-                      </MediumTitle>
-                      <MediumTitle fontSize={"2em"}>
-                        <ThermometerIcon width={"20px"} /> {tempMinRound}˚C min
-                      </MediumTitle>
-                      <Pline padding={"0 13px"} color={"#f9f9f9"}>
-                        {tempMaxRound}˚C max
-                      </Pline>
-                    </Box>
-                  </ContentBox>
-                </Box>
-              </Box>
-            </Column>
-            <Column mobile="12" tablet="12" desktop="2">
-              <Box padding={"0"} margin={"0"}>
-                <Box radius={"5px"} margin={"80px 15px 20px 0"}>
-                  <ContentBox height={"22vh"} margin={"0"}>
-                    <Box
-                      padding={"0"}
-                      margin={"0"}
-                      alignItems={"center"}
-                      flexDirection={"column"}
-                    >
-                      <MediumTitle fontSize={"1em"}>
-                        <ClockIcon width={"15px"} /> 16h
-                      </MediumTitle>
-                      <MediumTitle fontSize={"2em"}>
-                        <ThermometerIcon width={"20px"} /> {tempMinRound}˚C min
-                      </MediumTitle>
-                      <Pline padding={"0 13px"} color={"#f9f9f9"}>
-                        {tempMaxRound}˚C max
-                      </Pline>
-                    </Box>
-                  </ContentBox>
-                </Box>
-              </Box>
-              <Box padding={"0"} margin={"0"}>
-                <Box radius={"5px"} margin={"0 15px 20px 0"}>
-                  <ContentBox height={"22vh"} margin={"0"}>
-                    <Box
-                      padding={"0"}
-                      margin={"0"}
-                      alignItems={"center"}
-                      flexDirection={"column"}
-                    >
-                      <MediumTitle fontSize={"1em"}>
-                        <ClockIcon width={"15px"} /> 19h
-                      </MediumTitle>
-                      <MediumTitle fontSize={"2em"}>
-                        <ThermometerIcon width={"20px"} /> {tempMinRound}˚C min
-                      </MediumTitle>
-                      <Pline padding={"0 13px"} color={"#f9f9f9"}>
-                        {tempMaxRound}˚C max
-                      </Pline>
-                    </Box>
-                  </ContentBox>
-                </Box>
-              </Box>
-            </Column>
-            <Column mobile="12" tablet="12" desktop="2">
-              <Box padding={"0"} margin={"0"}>
-                <Box radius={"5px"} margin={"80px 15px 20px 0"}>
-                  <ContentBox height={"22vh"} margin={"0"}>
-                    <Box
-                      padding={"0"}
-                      margin={"0"}
-                      alignItems={"center"}
-                      flexDirection={"column"}
-                    >
-                      <MediumTitle fontSize={"1em"}>
-                        <ClockIcon width={"15px"} /> 17h
-                      </MediumTitle>
-                      <MediumTitle fontSize={"2em"}>
-                        <ThermometerIcon width={"20px"} /> {tempMinRound}˚C min
-                      </MediumTitle>
-                      <Pline padding={"0 13px"} color={"#f9f9f9"}>
-                        {tempMaxRound}˚C max
-                      </Pline>
-                    </Box>
-                  </ContentBox>
-                </Box>
-              </Box>
-              <Box padding={"0"} margin={"0"}>
-                <Box radius={"5px"} margin={"0 15px 20px 0"}>
-                  <ContentBox height={"22vh"} margin={"0"}>
-                    <Box
-                      padding={"0"}
-                      margin={"0"}
-                      alignItems={"center"}
-                      flexDirection={"row"}
-                      justifyContent={"center"}
-                    >
-                      <LoveIcon width={"30px"} />
-                      <MediumTitle margin={"0 0 0 10px"} fontSize={"1em"}>
-                        save location
-                      </MediumTitle>
-                    </Box>
-                  </ContentBox>
-                </Box>
-              </Box>
+              </ContentBox>
             </Column>
           </Column>
         </Row>
