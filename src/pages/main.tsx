@@ -65,7 +65,7 @@ const Main = (): any => {
   };
 
   const savedItemsExpires = () => {
-    let hoursToExpire = 1;
+    let hoursToExpire = 2;
     let now: any = new Date().getTime();
     console.log(now);
     let setupTime: any = localStorage.getItem("setupTime");
@@ -115,18 +115,20 @@ const Main = (): any => {
                 />
               </>
             )}
-            <Column mobile={"12"} tablet={"12"} desktop={"12"}>
-              <ContentBox margin={"0 50px"} height={"70vh"}>
-                <Box
-                  padding={"0"}
-                  margin={"0"}
-                  alignItems={"center"}
-                  flexDirection={"column"}
-                >
-                  {!load && <FireworkSpinner size={70} color="#f9f9f9" />}
-                </Box>
-              </ContentBox>
-            </Column>
+            {!load && (
+              <Column mobile={"12"} tablet={"12"} desktop={"12"}>
+                <ContentBox margin={"0 50px"} height={"70vh"}>
+                  <Box
+                    padding={"0"}
+                    margin={"0"}
+                    alignItems={"center"}
+                    flexDirection={"column"}
+                  >
+                    {!load && <FireworkSpinner size={70} color="#f9f9f9" />}
+                  </Box>
+                </ContentBox>
+              </Column>
+            )}
           </Column>
         </Row>
       </Container>
